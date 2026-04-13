@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atlas Copilot Studio ES — Magazine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:ital,wght@0,300;0,400;0,600;0,700;0,900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --amber: #f59e0b;
+  --amber-light: #fde68a;
+  --amber-dark: #b45309;
+  --amber-deep: #451a03;
+  --charcoal: #1c1917;
+  --charcoal-mid: #292524;
+  --stone-50: #fafaf9;
+  --stone-100: #f5f5f4;
+  --stone-200: #e7e5e4;
+  --stone-400: #a8a29e;
+  --stone-600: #57534e;
+  --stone-800: #292524;
+  --heading: 'Libre Baskerville', Georgia, serif;
+  --body: 'Source Sans 3', 'Source Sans Pro', sans-serif;
+}
+
+html {
+  overflow: hidden;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--body);
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  background: var(--charcoal);
+}
+
+/* ── Scroll container ── */
+.magazine {
+  display: flex;
+  width: 1000vw;
+  height: 100vh;
+  overflow: hidden;
+  scroll-snap-type: x mandatory;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.page {
+  flex: 0 0 100vw;
+  height: 100vh;
+  scroll-snap-align: start;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Nav dots ── */
+.nav-dots {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  z-index: 1000;
+  mix-blend-mode: difference;
+}
+.nav-dots .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.35);
+  cursor: pointer;
+  transition: all 0.4s ease;
+  border: none;
+  padding: 0;
+}
+.nav-dots .dot.active {
+  background: var(--amber);
+  transform: scale(1.4);
+  box-shadow: 0 0 12px rgba(245,158,11,0.5);
+}
+
+/* ── Page counter ── */
+.page-counter {
+  position: fixed;
+  bottom: 28px;
+  right: 40px;
+  font-family: var(--body);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  color: rgba(255,255,255,0.4);
+  z-index: 1000;
+  mix-blend-mode: difference;
+}
+
+/* ── Arrow hints ── */
+.arrow-hint {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 999;
+  font-size: 28px;
+  color: rgba(255,255,255,0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: none;
+  border: none;
+  padding: 16px;
+  mix-blend-mode: difference;
+}
+.arrow-hint:hover { color: var(--amber); transform: translateY(-50%) scale(1.2); }
+.arrow-left { left: 16px; }
+.arrow-right { right: 16px; }
+
+/* ── Typography ── */
+h1, h2, h3 { font-family: var(--heading); font-weight: 700; line-height: 1.1; }
+p, li { font-family: var(--body); line-height: 1.65; }
+
+.stat-huge {
+  font-family: var(--body);
+  font-weight: 900;
+  font-size: clamp(80px, 12vw, 140px);
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.label-sm {
+  font-family: var(--body);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.eyebrow {
+  font-family: var(--body);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+}
+
+/* ── Animations ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideRight {
+  from { opacity: 0; transform: translateX(-40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes drawLine {
+  from { width: 0; }
+  to { width: 100%; }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+.page .anim { opacity: 0; }
+.page.visible .anim { animation: fadeUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.page.visible .anim-d1 { animation-delay: 0.1s; }
+.page.visible .anim-d2 { animation-delay: 0.2s; }
+.page.visible .anim-d3 { animation-delay: 0.35s; }
+.page.visible .anim-d4 { animation-delay: 0.5s; }
+.page.visible .anim-d5 { animation-delay: 0.65s; }
+.page.visible .anim-d6 { animation-delay: 0.8s; }
+.page.visible .anim-d7 { animation-delay: 0.95s; }
+
+.page.visible .anim-slide { animation-name: slideRight; }
+.page.visible .anim-scale { animation-name: scaleIn; }
+
+/* ── Grain overlay ── */
+.grain {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px;
+}
+
+
+/* ══════════════════════════════════════════════
+   PAGE 1 — COVER (dark)
+   ══════════════════════════════════════════════ */
+.p-cover {
+  background: var(--charcoal);
+  color: var(--stone-50);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  position: relative;
+}
+.p-cover::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 75% 40%, rgba(245,158,11,0.08) 0%, transparent 70%),
+    radial-gradient(circle at 20% 80%, rgba(245,158,11,0.04) 0%, transparent 50%);
+  pointer-events: none;
+}
+.cover-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 8vh 6vw;
+  position: relative;
+  z-index: 2;
+}
+.cover-left .eyebrow {
+  color: var(--amber);
+  margin-bottom: 3vh;
+}
+.cover-left h1 {
+  font-size: clamp(42px, 5.5vw, 80px);
+  margin-bottom: 3vh;
+  letter-spacing: -0.02em;
+}
+.cover-left h1 span {
+  display: block;
+  color: var(--amber);
+}
+.cover-left .subtitle {
+  font-size: clamp(16px, 1.4vw, 22px);
+  color: var(--stone-400);
+  max-width: 480px;
+  font-weight: 300;
+}
+.cover-left .edition {
+  margin-top: auto;
+  padding-top: 4vh;
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  color: var(--stone-600);
+  text-transform: uppercase;
+}
+.cover-right {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.cover-glyph {
+  width: 70%;
+  aspect-ratio: 1;
+  position: relative;
+}
+.cover-glyph::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 2px solid rgba(245,158,11,0.2);
+  border-radius: 50%;
+}
+.cover-glyph::after {
+  content: '';
+  position: absolute;
+  inset: 15%;
+  border: 1px solid rgba(245,158,11,0.1);
+  border-radius: 50%;
+  animation: pulse 4s ease-in-out infinite;
+}
+.glyph-inner {
+  position: absolute;
+  inset: 30%;
+  background: radial-gradient(circle, rgba(245,158,11,0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.glyph-inner svg {
+  width: 60%;
+  height: 60%;
+  stroke: var(--amber);
+  stroke-width: 1;
+  fill: none;
+  opacity: 0.6;
+}
+.cover-line {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--amber), transparent);
+}
+.p-cover.visible .cover-line { animation: drawLine 1.5s ease-out 0.5s forwards; }
+
+/* ══════════════════════════════════════════════
+   PAGE 2 — PROBLEM
+   ══════════════════════════════════════════════ */
+.p-problem {
+  background: var(--stone-50);
+  color: var(--charcoal);
+  display: grid;
+  grid-template-columns: 42% 58%;
+}
+.problem-left {
+  background: var(--amber-deep);
+  color: var(--amber-light);
+  padding: 8vh 5vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.problem-left::after {
+  content: '';
+  position: absolute;
+  top: -20%;
+  right: -30%;
+  width: 80%;
+  aspect-ratio: 1;
+  border: 1px solid rgba(253,230,138,0.1);
+  border-radius: 50%;
+}
+.problem-left .stat-huge {
+  color: var(--amber);
+  margin-bottom: 2vh;
+}
+.problem-left p {
+  font-size: clamp(15px, 1.2vw, 18px);
+  opacity: 0.8;
+  max-width: 380px;
+}
+.problem-right {
+  padding: 8vh 6vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.problem-right .eyebrow {
+  color: var(--amber-dark);
+  margin-bottom: 3vh;
+}
+.problem-right h2 {
+  font-size: clamp(32px, 3.5vw, 54px);
+  margin-bottom: 4vh;
+  max-width: 580px;
+  letter-spacing: -0.01em;
+}
+.pain-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.pain-list li {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  font-size: clamp(14px, 1.1vw, 17px);
+  color: var(--stone-600);
+}
+.pain-list .icon {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  background: var(--amber);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--charcoal);
+  font-weight: 900;
+  font-size: 16px;
+}
+
+/* ══════════════════════════════════════════════
+   PAGE 3 — SOLUTION (steps)
+   ══════════════════════════════════════════════ */
+.p-solution {
+  background: #fef9ee;
+  color: var(--charcoal);
+  display: flex;
+  flex-direction: column;
+  padding: 6vh 6vw;
+}
+.solution-header {
+  margin-bottom: 5vh;
+}
+.solution-header .eyebrow {
+  color: var(--amber-dark);
+  margin-bottom: 1.5vh;
+}
+.solution-header h2 {
+  font-size: clamp(30px, 3.2vw, 50px);
+  max-width: 700px;
+}
+.steps-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0;
+}
+.step-card {
+  padding: 3vh 2vw;
+  border-right: 1px solid rgba(28,25,23,0.08);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.step-card:last-child { border-right: none; }
+.step-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 2vw;
+  right: 2vw;
+  height: 3px;
+  background: var(--amber);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.6s ease;
+}
+.page.visible .step-card::before { transform: scaleX(1); }
+.step-num {
+  font-family: var(--body);
+  font-weight: 900;
+  font-size: clamp(48px, 5vw, 72px);
+  color: rgba(245,158,11,0.15);
+  line-height: 1;
+  margin-bottom: 2vh;
+}
+.step-card h3 {
+  font-size: clamp(16px, 1.4vw, 22px);
+  margin-bottom: 1.5vh;
+  color: var(--charcoal);
+}
+.step-card p {
+  font-size: clamp(12px, 0.95vw, 15px);
+  color: var(--stone-600);
+  flex: 1;
+}
+.step-card .step-count {
+  margin-top: 2vh;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--amber-dark);
+  letter-spacing: 0.1em;
+}
+
+/* ══════════════════════════════════════════════
+   PAGE 4 — FEATURES
+   ══════════════════════════════════════════════ */
+.p-features {
+  background: var(--charcoal-mid);
+  color: var(--stone-50);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+.feat-cell {
+  padding: 5vh 4vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+.feat-cell:nth-child(2n) { border-right: none; }
+.feat-cell:nth-child(n+3) { border-bottom: none; }
+.feat-cell .eyebrow {
+  color: var(--amber);
+  margin-bottom: 2vh;
+}
+.feat-cell h3 {
+  font-size: clamp(22px, 2.2vw, 34px);
+  margin-bottom: 1.5vh;
+}
+.feat-cell p {
+  font-size: clamp(13px, 1vw, 16px);
+  color: var(--stone-400);
+  max-width: 420px;
+}
+.feat-cell .stat-huge {
+  color: var(--amber);
+  margin-bottom: 1vh;
+}
+.feat-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 2vh;
+}
+.feat-tags span {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  padding: 5px 12px;
+  border: 1px solid rgba(245,158,11,0.3);
+  border-radius: 2px;
+  color: var(--amber-light);
+}
+
+/* ══════════════════════════════════════════════
+   PAGE 5 — AUDIENCE
+   ══════════════════════════════════════════════ */
+.p-audience {
+  background: #f7f2ea;
+  color: var(--charcoal);
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+.audience-col {
+  padding: 8vh 4vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-right: 1px solid rgba(28,25,23,0.06);
+  position: relative;
+}
+.audience-col:last-child { border-right: none; }
+.audience-col::before {
+  content: '';
+  position: absolute;
+  top: 8vh;
+  left: 4vw;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--amber);
+  opacity: 0.12;
+}
+.audience-col .persona-icon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 3vh;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.audience-col .persona-icon svg {
+  width: 28px;
+  height: 28px;
+  stroke: var(--amber-dark);
+  fill: none;
+  stroke-width: 2;
+}
+.audience-col .eyebrow {
+  color: var(--amber-dark);
+  margin-bottom: 2vh;
+}
+.audience-col h3 {
+  font-size: clamp(22px, 2vw, 32px);
+  margin-bottom: 2vh;
+}
+.audience-col p {
+  font-size: clamp(13px, 1vw, 16px);
+  color: var(--stone-600);
+  margin-bottom: 2vh;
+}
+.audience-col .needs {
+  list-style: none;
+  margin-top: auto;
+}
+.audience-col .needs li {
+  font-size: 13px;
+  padding: 8px 0;
+  border-top: 1px solid rgba(28,25,23,0.08);
+  color: var(--stone-600);
+}
+.audience-col .needs li::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: var(--amber);
+  border-radius: 1px;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+/* ══════════════════════════════════════════════
+   PAGE 6 — COMPETITION
+   ══════════════════════════════════════════════ */
+.p-competition {
+  background: var(--charcoal);
+  color: var(--stone-50);
+  display: grid;
+  grid-template-columns: 55% 45%;
+}
+.comp-left {
+  padding: 8vh 6vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+.comp-left .eyebrow {
+  color: var(--amber);
+  margin-bottom: 3vh;
+}
+.comp-left h2 {
+  font-size: clamp(30px, 3.5vw, 52px);
+  margin-bottom: 4vh;
+  max-width: 520px;
+}
+.comp-table {
+  width: 100%;
+  max-width: 500px;
+}
+.comp-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  font-size: 13px;
+}
+.comp-row.header {
+  font-weight: 700;
+  color: var(--amber);
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+.comp-row span:first-child { color: var(--stone-400); }
+.comp-check { color: var(--amber); font-weight: 700; }
+.comp-x { color: var(--stone-600); }
+.comp-right {
+  padding: 8vh 5vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4vh;
+}
+.comp-right .diff-block {
+  padding-left: 20px;
+  border-left: 3px solid var(--amber);
+}
+.comp-right .diff-block h4 {
+  font-family: var(--heading);
+  font-size: clamp(16px, 1.3vw, 20px);
+  margin-bottom: 1vh;
+}
+.comp-right .diff-block p {
+  font-size: clamp(13px, 0.95vw, 15px);
+  color: var(--stone-400);
+}
+
+/* ══════════════════════════════════════════════
+   PAGE 7 — ORIGIN STORY
+   ══════════════════════════════════════════════ */
+.p-origin {
+  background: #f4ede4;
+  color: var(--charcoal);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.origin-left {
+  padding: 8vh 6vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.origin-left .eyebrow {
+  color: var(--amber-dark);
+  margin-bottom: 3vh;
+}
+.origin-left h2 {
+  font-size: clamp(30px, 3.5vw, 52px);
+  margin-bottom: 3vh;
+}
+.origin-left blockquote {
+  font-family: var(--heading);
+  font-style: italic;
+  font-size: clamp(18px, 1.6vw, 24px);
+  color: var(--stone-600);
+  border-left: 3px solid var(--amber);
+  padding-left: 24px;
+  margin-bottom: 3vh;
+  max-width: 450px;
+  line-height: 1.5;
+}
+.origin-left .origin-meta {
+  font-size: 14px;
+  color: var(--stone-600);
+}
+.origin-left .origin-meta strong { color: var(--charcoal); }
+.origin-right {
+  background: var(--amber-deep);
+  color: var(--amber-light);
+  padding: 8vh 5vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3vh;
+  position: relative;
+  overflow: hidden;
+}
+.origin-right::before {
+  content: 'ATLAS';
+  position: absolute;
+  top: -5vh;
+  right: -3vw;
+  font-family: var(--heading);
+  font-size: clamp(120px, 18vw, 260px);
+  font-weight: 700;
+  color: rgba(253,230,138,0.04);
+  line-height: 1;
+  pointer-events: none;
+}
+.origin-right h3 {
+  font-size: clamp(18px, 1.5vw, 24px);
+  margin-bottom: 1vh;
+  color: var(--amber);
+}
+.origin-right .pillar {
+  padding-left: 16px;
+  border-left: 2px solid rgba(245,158,11,0.3);
+}
+.origin-right .pillar p {
+  font-size: clamp(13px, 1vw, 16px);
+  opacity: 0.8;
+}
+.origin-right .pillar .label-sm {
+  color: var(--amber);
+  margin-bottom: 0.5vh;
+  display: block;
+}
+
+/* ══════════════════════════════════════════════
+   PAGE 8 — TRACTION / STATS
+   ══════════════════════════════════════════════ */
+.p-traction {
+  background: #fffbf0;
+  color: var(--charcoal);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+.traction-cell {
+  padding: 5vh 4.5vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-right: 1px solid rgba(28,25,23,0.06);
+  border-bottom: 1px solid rgba(28,25,23,0.06);
+  position: relative;
+}
+.traction-cell:nth-child(2n) { border-right: none; }
+.traction-cell:nth-child(n+3) { border-bottom: none; }
+.traction-cell .stat-huge {
+  color: var(--amber-dark);
+  margin-bottom: 1vh;
+}
+.traction-cell h3 {
+  font-size: clamp(18px, 1.6vw, 26px);
+  margin-bottom: 1vh;
+}
+.traction-cell p {
+  font-size: clamp(13px, 1vw, 16px);
+  color: var(--stone-600);
+  max-width: 380px;
+}
+.traction-cell .case-label {
+  margin-top: auto;
+  padding-top: 2vh;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--amber-dark);
+  text-transform: uppercase;
+}
+
+/* ══════════════════════════════════════════════
+   PAGE 9 — TECH
+   ══════════════════════════════════════════════ */
+.p-tech {
+  background: var(--charcoal-mid);
+  color: var(--stone-50);
+  display: grid;
+  grid-template-columns: 50% 50%;
+}
+.tech-left {
+  padding: 8vh 5vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+.tech-left .eyebrow {
+  color: var(--amber);
+  margin-bottom: 3vh;
+}
+.tech-left h2 {
+  font-size: clamp(30px, 3.2vw, 50px);
+  margin-bottom: 4vh;
+}
+.tech-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.tech-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.tech-badge {
+  padding: 6px 14px;
+  background: rgba(245,158,11,0.1);
+  border: 1px solid rgba(245,158,11,0.2);
+  border-radius: 3px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--amber-light);
+  white-space: nowrap;
+}
+.tech-desc {
+  font-size: 13px;
+  color: var(--stone-400);
+}
+.tech-right {
+  padding: 6vh 5vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3vh;
+}
+.tech-right .arch-block {
+  padding: 3vh 2.5vw;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 4px;
+}
+.tech-right .arch-block h4 {
+  font-family: var(--heading);
+  font-size: clamp(15px, 1.2vw, 19px);
+  margin-bottom: 1vh;
+  color: var(--amber-light);
+}
+.tech-right .arch-block p {
+  font-size: clamp(12px, 0.9vw, 15px);
+  color: var(--stone-400);
+}
+.tech-right .arch-block .stat-inline {
+  font-family: var(--body);
+  font-weight: 900;
+  font-size: clamp(36px, 4vw, 56px);
+  color: var(--amber);
+  display: block;
+  margin-top: 1vh;
+}
+
+/* ══════════════════════════════════════════════
+   PAGE 10 — BACK COVER (dark)
+   ══════════════════════════════════════════════ */
+.p-back {
+  background: var(--charcoal);
+  color: var(--stone-50);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.p-back::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 50%, rgba(245,158,11,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+.back-content {
+  position: relative;
+  z-index: 2;
+  max-width: 700px;
+}
+.back-content h2 {
+  font-size: clamp(36px, 4.5vw, 68px);
+  margin-bottom: 3vh;
+  letter-spacing: -0.02em;
+}
+.back-content h2 span { color: var(--amber); }
+.back-content p {
+  font-size: clamp(16px, 1.3vw, 20px);
+  color: var(--stone-400);
+  margin-bottom: 4vh;
+  font-weight: 300;
+}
+.back-cta {
+  display: inline-block;
+  padding: 16px 48px;
+  background: var(--amber);
+  color: var(--charcoal);
+  font-family: var(--body);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.back-cta:hover {
+  background: var(--amber-light);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(245,158,11,0.3);
+}
+.back-footer {
+  position: absolute;
+  bottom: 5vh;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4vw;
+  font-size: 12px;
+  color: var(--stone-600);
+  letter-spacing: 0.1em;
+}
+.back-lines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.back-lines span {
+  position: absolute;
+  background: rgba(245,158,11,0.04);
+}
+.back-lines .bl-h1 { top: 25%; left: 0; width: 100%; height: 1px; }
+.back-lines .bl-h2 { top: 75%; left: 0; width: 100%; height: 1px; }
+.back-lines .bl-v1 { left: 25%; top: 0; width: 1px; height: 100%; }
+.back-lines .bl-v2 { left: 75%; top: 0; width: 1px; height: 100%; }
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+
+<div class="magazine" id="magazine">
+
+  <!-- ═══ PAGE 1: COVER ═══ -->
+  <section class="page p-cover visible" data-page="0">
+    <div class="cover-left">
+      <div class="eyebrow anim anim-d1">Referencia editorial en espanol</div>
+      <h1 class="anim anim-d2">
+        Atlas<br>
+        <span>Copilot Studio</span>
+      </h1>
+      <p class="subtitle anim anim-d3">Construye, conecta y escala agentes conversacionales con criterio. Sin relleno, sin capturas de pantalla que caducan.</p>
+      <div class="edition anim anim-d5">Abril 2026 &mdash; Primera edicion</div>
+    </div>
+    <div class="cover-right">
+      <div class="cover-glyph anim anim-scale anim-d3">
+        <div class="glyph-inner">
+          <svg viewBox="0 0 100 100">
+            <polygon points="50,8 92,75 8,75" />
+            <circle cx="50" cy="52" r="18" />
+            <line x1="50" y1="34" x2="50" y2="8" />
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div class="cover-line"></div>
+  </section>
+
+  <!-- ═══ PAGE 2: PROBLEM ═══ -->
+  <section class="page p-problem" data-page="1">
+    <div class="problem-left">
+      <div class="stat-huge anim anim-d1">3x</div>
+      <p class="anim anim-d2">La documentacion oficial de Microsoft Learn es exhaustiva &mdash; pero dispersa, en ingles y sin criterio de prioridad. Aprender Copilot Studio hoy requiere <strong>3 veces mas tiempo</strong> del necesario.</p>
+    </div>
+    <div class="problem-right">
+      <div class="eyebrow anim anim-d1">El problema</div>
+      <h2 class="anim anim-d2">La brecha entre la documentacion oficial y la implementacion real</h2>
+      <ul class="pain-list">
+        <li class="anim anim-d3"><span class="icon">1</span><span>Documentacion fragmentada en cientos de paginas sin hilo conductor ni opinion sobre que importa realmente</span></li>
+        <li class="anim anim-d4"><span class="icon">2</span><span>Tutoriales basados en capturas de pantalla que caducan con cada actualizacion mensual de la plataforma</span></li>
+        <li class="anim anim-d5"><span class="icon">3</span><span>Cero contenido en espanol con profundidad tecnica y enfoque empresarial real</span></li>
+        <li class="anim anim-d6"><span class="icon">4</span><span>Ningun recurso conecta las decisiones de negocio con las decisiones de arquitectura tecnica</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ═══ PAGE 3: SOLUTION ═══ -->
+  <section class="page p-solution" data-page="2">
+    <div class="solution-header">
+      <div class="eyebrow anim anim-d1">La solucion</div>
+      <h2 class="anim anim-d2">5 fases que cubren el ciclo completo del agente</h2>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card anim anim-d2">
+        <div class="step-num">01</div>
+        <h3>Empezar</h3>
+        <p>Orientacion, licenciamiento, ecosistema y tu primer agente funcional en menos de una hora.</p>
+        <div class="step-count">3 articulos</div>
+      </div>
+      <div class="step-card anim anim-d3">
+        <div class="step-num">02</div>
+        <h3>Construir</h3>
+        <p>Conocimiento, temas, instrucciones, Prompt Tools, Power FX, Adaptive Cards y Agent Flows.</p>
+        <div class="step-count">7 articulos</div>
+      </div>
+      <div class="step-card anim anim-d4">
+        <div class="step-num">03</div>
+        <h3>Conectar</h3>
+        <p>Power Automate, Dataverse, Azure AI Foundry y APIs externas. El agente no vive aislado.</p>
+        <div class="step-count">4 articulos</div>
+      </div>
+      <div class="step-card anim anim-d5">
+        <div class="step-num">04</div>
+        <h3>Publicar</h3>
+        <p>8 canales de despliegue, autenticacion SSO con Entra ID y herencia de permisos.</p>
+        <div class="step-count">2 articulos</div>
+      </div>
+      <div class="step-card anim anim-d6">
+        <div class="step-num">05</div>
+        <h3>Escalar</h3>
+        <p>ALM, patrones arquitectonicos, gobernanza, analytics y agentes multilingues.</p>
+        <div class="step-count">5 articulos</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ PAGE 4: FEATURES ═══ -->
+  <section class="page p-features" data-page="3">
+    <div class="feat-cell anim anim-d1">
+      <div class="eyebrow">Patrones</div>
+      <div class="stat-huge">9</div>
+      <h3>Arquitecturas reutilizables</h3>
+      <p>Desde RAG hibrido adaptativo hasta MCP Gateway para herramientas empresariales. Patrones probados en produccion.</p>
+    </div>
+    <div class="feat-cell anim anim-d2">
+      <div class="eyebrow">Contenido</div>
+      <h3>21 articulos con opinion</h3>
+      <p>No es una traduccion de docs oficiales. Es conocimiento destilado con criterio propio, basado en experiencia directa construyendo agentes B2B.</p>
+      <div class="feat-tags">
+        <span>RAG</span>
+        <span>Power FX</span>
+        <span>Prompt Tools</span>
+        <span>Adaptive Cards</span>
+        <span>Agent Flows</span>
+      </div>
+    </div>
+    <div class="feat-cell anim anim-d3">
+      <div class="eyebrow">Integraciones</div>
+      <h3>El agente no vive aislado</h3>
+      <p>Power Automate, Dataverse, Azure AI Foundry y APIs externas. 8 canales de publicacion incluyendo Teams y M365 Copilot Chat.</p>
+      <div class="feat-tags">
+        <span>Teams</span>
+        <span>SharePoint</span>
+        <span>Dataverse</span>
+        <span>Azure</span>
+        <span>APIs</span>
+      </div>
+    </div>
+    <div class="feat-cell anim anim-d4">
+      <div class="eyebrow">Produccion</div>
+      <h3>Gobernanza real de extremo a extremo</h3>
+      <p>DLP, control de creacion, seguridad multicapa, ALM con VS Code y PAC CLI, pipelines de evaluacion de calidad con LLM-as-Judge.</p>
+      <div class="feat-tags">
+        <span>DLP</span>
+        <span>Entra ID</span>
+        <span>ALM</span>
+        <span>CI/CD</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ PAGE 5: AUDIENCE ═══ -->
+  <section class="page p-audience" data-page="4">
+    <div class="audience-col anim anim-d1">
+      <div class="persona-icon">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+      </div>
+      <div class="eyebrow">Perfil 01</div>
+      <h3>Perfiles de negocio</h3>
+      <p>Decisores que necesitan entender que puede hacer Copilot Studio sin depender del equipo tecnico para cada decision.</p>
+      <ul class="needs">
+        <li>Entender capacidades reales vs. marketing</li>
+        <li>Evaluar costes con datos concretos</li>
+        <li>Tomar decisiones de build vs. buy</li>
+      </ul>
+    </div>
+    <div class="audience-col anim anim-d3">
+      <div class="persona-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      </div>
+      <div class="eyebrow">Perfil 02</div>
+      <h3>Makers y citizen developers</h3>
+      <p>Ya trabajan en Power Platform y quieren anadir capacidades de agentes. Conocen el low-code y necesitan un mapa claro.</p>
+      <ul class="needs">
+        <li>Guia practica sin empezar de cero</li>
+        <li>Patrones arquitectonicos probados</li>
+        <li>Integraciones con su stack actual</li>
+      </ul>
+    </div>
+    <div class="audience-col anim anim-d5">
+      <div class="persona-icon">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      <div class="eyebrow">Perfil 03</div>
+      <h3>Formadores y consultores</h3>
+      <p>Necesitan material estructurado con voz editorial y perspectiva para transferir conocimiento a equipos cliente.</p>
+      <ul class="needs">
+        <li>Material referenciable en formacion</li>
+        <li>Criterio propio, no solo funcionalidades</li>
+        <li>Casos reales con metricas</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ═══ PAGE 6: COMPETITION ═══ -->
+  <section class="page p-competition" data-page="5">
+    <div class="comp-left">
+      <div class="eyebrow anim anim-d1">Posicionamiento</div>
+      <h2 class="anim anim-d2">No compite. Complementa con lo que falta.</h2>
+      <div class="comp-table anim anim-d3">
+        <div class="comp-row header">
+          <span>Criterio</span>
+          <span>MS Learn</span>
+          <span>Atlas</span>
+        </div>
+        <div class="comp-row">
+          <span>Opinion editorial</span>
+          <span class="comp-x">&mdash;</span>
+          <span class="comp-check">&bull;</span>
+        </div>
+        <div class="comp-row">
+          <span>Espanol nativo</span>
+          <span class="comp-x">&mdash;</span>
+          <span class="comp-check">&bull;</span>
+        </div>
+        <div class="comp-row">
+          <span>Patrones produccion</span>
+          <span class="comp-x">&mdash;</span>
+          <span class="comp-check">&bull;</span>
+        </div>
+        <div class="comp-row">
+          <span>Enfoque B2B real</span>
+          <span class="comp-x">&mdash;</span>
+          <span class="comp-check">&bull;</span>
+        </div>
+        <div class="comp-row">
+          <span>Cobertura exhaustiva</span>
+          <span class="comp-check">&bull;</span>
+          <span class="comp-x">80%</span>
+        </div>
+        <div class="comp-row">
+          <span>Actualizacion continua</span>
+          <span class="comp-check">&bull;</span>
+          <span class="comp-check">&bull;</span>
+        </div>
+      </div>
+    </div>
+    <div class="comp-right">
+      <div class="diff-block anim anim-d2">
+        <h4>vs. Microsoft Learn</h4>
+        <p>Mas editorial y opinado. Prioriza senal sobre ruido. Incluye lo que los docs oficiales omiten: que NO hacer y las trampas reales.</p>
+      </div>
+      <div class="diff-block anim anim-d3">
+        <h4>vs. Cursos online</h4>
+        <p>Mas estrategico y centrado en arquitectura. No es un tutorial paso a paso — esta disenado para la toma de decisiones, no solo la ejecucion.</p>
+      </div>
+      <div class="diff-block anim anim-d4">
+        <h4>Propuesta unica</h4>
+        <p>La unica referencia comprehensiva en espanol que combina profundidad tecnica + estrategia de negocio + patrones de produccion empresarial.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ PAGE 7: ORIGIN STORY ═══ -->
+  <section class="page p-origin" data-page="6">
+    <div class="origin-left">
+      <div class="eyebrow anim anim-d1">Origen</div>
+      <h2 class="anim anim-d2">Nacio de la frustracion real</h2>
+      <blockquote class="anim anim-d3">Si buscas la referencia oficial, Microsoft Learn es tu sitio. Si quieres entender de verdad, este Atlas es tu punto de partida.</blockquote>
+      <div class="origin-meta anim anim-d4">
+        <p><strong>Creado por David Dix</strong><br>Formador y product owner en The Power Education.<br>Basado en Agent Academy de Microsoft, documentacion tecnica de arquitectura IQ y experiencia directa construyendo agentes B2B en produccion.</p>
+      </div>
+    </div>
+    <div class="origin-right">
+      <h3 class="anim anim-d2">Filosofia del Atlas</h3>
+      <div class="pillar anim anim-d3">
+        <span class="label-sm">Opinado</span>
+        <p>Esto es lo que yo haria y por que. No neutral — con criterio editorial basado en experiencia.</p>
+      </div>
+      <div class="pillar anim anim-d4">
+        <span class="label-sm">Basado en datos</span>
+        <p>Metricas concretas, no generalizaciones. Costes reales, tiempos reales, limites reales.</p>
+      </div>
+      <div class="pillar anim anim-d5">
+        <span class="label-sm">Enfocado a produccion</span>
+        <p>Cubre el 80% de los casos de uso reales. No pretende ser exhaustivo — pretende ser util.</p>
+      </div>
+      <div class="pillar anim anim-d6">
+        <span class="label-sm">Probado en campo</span>
+        <p>Cada recomendacion ha sido validada en despliegues reales. No teoria — practica empresarial.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ PAGE 8: TRACTION ═══ -->
+  <section class="page p-traction" data-page="7">
+    <div class="traction-cell anim anim-d1">
+      <div class="stat-huge">5-6h</div>
+      <h3>Ahorro semanal por usuario</h3>
+      <p>Buscando informacion entre 3 fuentes distintas. Un agente bien construido con el Atlas elimina esas horas.</p>
+      <div class="case-label">Caso CS-001</div>
+    </div>
+    <div class="traction-cell anim anim-d2">
+      <div class="stat-huge">5min</div>
+      <h3>Intake de 3-5 dias a 5 minutos</h3>
+      <p>Proceso de recogida de datos que tardaba dias via email, reducido a minutos con formularios conversacionales.</p>
+      <div class="case-label">Caso CS-003</div>
+    </div>
+    <div class="traction-cell anim anim-d3">
+      <div class="stat-huge">$200</div>
+      <h3>25.000 creditos/mes</h3>
+      <p>Paquete de capacidad a 0.01 USD por credito consumido. Coste predecible y escalable para entornos empresariales.</p>
+      <div class="case-label">Licenciamiento</div>
+    </div>
+    <div class="traction-cell anim anim-d4">
+      <div class="stat-huge">21</div>
+      <h3>Articulos de profundidad</h3>
+      <p>Desde tu primer agente hasta gobernanza multi-entorno con ALM, DLP y pipelines de evaluacion automatizada.</p>
+      <div class="case-label">Contenido</div>
+    </div>
+  </section>
+
+  <!-- ═══ PAGE 9: TECH ═══ -->
+  <section class="page p-tech" data-page="8">
+    <div class="tech-left">
+      <div class="eyebrow anim anim-d1">Stack tecnico</div>
+      <h2 class="anim anim-d2">Construido para durar y escalar</h2>
+      <div class="tech-stack anim anim-d3">
+        <div class="tech-row">
+          <span class="tech-badge">Astro 6</span>
+          <span class="tech-desc">Generacion estatica, rendimiento maximo</span>
+        </div>
+        <div class="tech-row">
+          <span class="tech-badge">Starlight</span>
+          <span class="tech-desc">Tema especializado en documentacion</span>
+        </div>
+        <div class="tech-row">
+          <span class="tech-badge">React 19</span>
+          <span class="tech-desc">Componentes interactivos bajo demanda</span>
+        </div>
+        <div class="tech-row">
+          <span class="tech-badge">Tailwind 4</span>
+          <span class="tech-desc">CSS utilitario + editorial personalizado</span>
+        </div>
+        <div class="tech-row">
+          <span class="tech-badge">Vercel</span>
+          <span class="tech-desc">Despliegue continuo desde GitHub</span>
+        </div>
+        <div class="tech-row">
+          <span class="tech-badge">Markdown</span>
+          <span class="tech-desc">21 ficheros .md con frontmatter YAML</span>
+        </div>
+      </div>
+    </div>
+    <div class="tech-right">
+      <div class="arch-block anim anim-d2">
+        <h4>Arquitectura IQ</h4>
+        <p>El Atlas documenta las tres capas de inteligencia: Work IQ, Fabric IQ y Foundry IQ. Cada capa amplifica las capacidades del agente.</p>
+        <span class="stat-inline">3 capas</span>
+      </div>
+      <div class="arch-block anim anim-d3">
+        <h4>Pipeline de evaluacion</h4>
+        <p>8 pasos automatizados con LLM-as-Judge para medir calidad, precision y seguridad de respuestas en produccion.</p>
+        <span class="stat-inline">8 pasos</span>
+      </div>
+      <div class="arch-block anim anim-d4">
+        <h4>Ciclo ADLC</h4>
+        <p>Agent Development Lifecycle completo: Plan, Code, Test, Deploy, Monitor, Operate. Del prototipo a la gobernanza.</p>
+        <span class="stat-inline">6 fases</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ PAGE 10: BACK COVER ═══ -->
+  <section class="page p-back" data-page="9">
+    <div class="back-lines">
+      <span class="bl-h1"></span><span class="bl-h2"></span>
+      <span class="bl-v1"></span><span class="bl-v2"></span>
+    </div>
+    <div class="back-content">
+      <div class="eyebrow anim anim-d1" style="color: var(--amber); margin-bottom: 4vh;">Atlas Copilot Studio ES</div>
+      <h2 class="anim anim-d2">Con criterio.<br><span>Sin relleno.</span></h2>
+      <p class="anim anim-d3">La referencia editorial en espanol para construir, conectar y escalar agentes conversacionales en entornos empresariales reales.</p>
+      <a class="back-cta anim anim-d4" href="https://github.com/dixdavid80-bit/atlas-copilotstudio-es" target="_blank">Explorar el Atlas</a>
+    </div>
+    <div class="back-footer anim anim-d6">
+      <span>github.com/dixdavid80-bit/atlas-copilotstudio-es</span>
+      <span>&bull;</span>
+      <span>David Dix &mdash; The Power Education</span>
+      <span>&bull;</span>
+      <span>Abril 2026</span>
+    </div>
+  </section>
+
+</div>
+
+<!-- Nav dots -->
+<div class="nav-dots" id="navDots"></div>
+<div class="page-counter" id="pageCounter">01 / 10</div>
+<button class="arrow-hint arrow-left" id="arrowLeft" aria-label="Anterior">&#8592;</button>
+<button class="arrow-hint arrow-right" id="arrowRight" aria-label="Siguiente">&#8594;</button>
+
+<script>
+(function() {
+  const magazine = document.getElementById('magazine');
+  const pages = document.querySelectorAll('.page');
+  const navDots = document.getElementById('navDots');
+  const counter = document.getElementById('pageCounter');
+  const arrowLeft = document.getElementById('arrowLeft');
+  const arrowRight = document.getElementById('arrowRight');
+  const total = pages.length;
+  let current = 0;
+  let isAnimating = false;
+
+  // Create dots
+  for (let i = 0; i < total; i++) {
+    const dot = document.createElement('button');
+    dot.className = 'dot' + (i === 0 ? ' active' : '');
+    dot.setAttribute('aria-label', 'Pagina ' + (i + 1));
+    dot.addEventListener('click', () => goTo(i));
+    navDots.appendChild(dot);
+  }
+
+  function goTo(index) {
+    if (isAnimating || index === current || index < 0 || index >= total) return;
+    isAnimating = true;
+
+    pages[current].classList.remove('visible');
+    current = index;
+    magazine.style.transform = `translateX(-${current * 100}vw)`;
+
+    // Update dots
+    navDots.querySelectorAll('.dot').forEach((d, i) => {
+      d.classList.toggle('active', i === current);
+    });
+
+    // Update counter
+    counter.textContent = String(current + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
+
+    // Update arrow visibility
+    arrowLeft.style.opacity = current === 0 ? '0' : '1';
+    arrowLeft.style.pointerEvents = current === 0 ? 'none' : 'auto';
+    arrowRight.style.opacity = current === total - 1 ? '0' : '1';
+    arrowRight.style.pointerEvents = current === total - 1 ? 'none' : 'auto';
+
+    // Trigger page animations after transition
+    setTimeout(() => {
+      pages[current].classList.add('visible');
+      isAnimating = false;
+    }, 350);
+  }
+
+  // Arrow clicks
+  arrowLeft.addEventListener('click', () => goTo(current - 1));
+  arrowRight.addEventListener('click', () => goTo(current + 1));
+
+  // Keyboard
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); goTo(current + 1); }
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); goTo(current - 1); }
+    if (e.key === 'Home') { e.preventDefault(); goTo(0); }
+    if (e.key === 'End') { e.preventDefault(); goTo(total - 1); }
+  });
+
+  // Touch / swipe
+  let touchStartX = 0;
+  let touchStartY = 0;
+  document.addEventListener('touchstart', (e) => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+  document.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = e.changedTouches[0].clientY - touchStartY;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+      if (dx < 0) goTo(current + 1);
+      else goTo(current - 1);
+    }
+  }, { passive: true });
+
+  // Mouse wheel (horizontal)
+  let wheelTimeout;
+  document.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    clearTimeout(wheelTimeout);
+    wheelTimeout = setTimeout(() => {
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+        if (e.deltaX > 30) goTo(current + 1);
+        else if (e.deltaX < -30) goTo(current - 1);
+      } else {
+        if (e.deltaY > 30) goTo(current + 1);
+        else if (e.deltaY < -30) goTo(current - 1);
+      }
+    }, 50);
+  }, { passive: false });
+
+  // Init arrow state
+  arrowLeft.style.opacity = '0';
+  arrowLeft.style.pointerEvents = 'none';
+})();
+</script>
+</body>
+</html>
